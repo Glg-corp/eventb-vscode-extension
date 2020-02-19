@@ -1,3 +1,7 @@
+Basic Langage support for event-B
+
+Hello UNamur students!
+
 # eventb README
 
 This is the README for your extension "eventb". After writing up a brief description, we recommend including the following sections.

@@ -2,6 +2,7 @@
     "name": "eventb",
     "displayName": "EventB",
     "icon" : "icon.jpg",
+    "publisher":"GlgCorp", 
     "description": "Event B syntax highlighting + autocompletion + snippets",
     "version": "0.0.1",
     "repository": {
