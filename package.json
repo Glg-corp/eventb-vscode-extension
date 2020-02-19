@@ -3,11 +3,11 @@
 	"displayName": "Event-B Language Support",
 	"icon": "icon.jpg",
 	"publisher": "GlgCorp",
-	"description": "Event B syntax highlighting + autocompletion + snippets",
+	"description": "Event B syntax highlighting + snippets",
 	"version": "0.0.2",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/martin-danhier/eventb-vscode-extension"
+		"url": "https://github.com/glg-corp/eventb-vscode-extension"
 	},
 	"engines": {
 		"vscode": "^1.42.0"
