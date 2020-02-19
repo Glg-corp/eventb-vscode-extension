@@ -1,0 +1,54 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Event-B",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include" : "#constants"
+		},
+		{
+			"include" : "#labels"
+		},
+		{
+			"include" : "#types"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.eventb",
+				"match": "\\b(machine|variables|invariants|events|where|then|end|any|sets|constants|axioms|refines|sees|with|theorem|extends)\\b"
+			}]
+		},
+		"comments": {
+			"name": "comment.eventb",
+			"match": "\\/\\/[^\\n]*"
+		},
+		"constants": {
+			"patterns": [
+				{
+					"name": "constant.language.eventb",
+					"match": "\\b(TRUE|FALSE)\\b"
+				},
+				{
+					"name": "constant.numeric.eventb",
+					"match": "\\b\\d+\\b"
+				}
+			]
+		},
+		"labels" : {
+			"name" : "entity.name.tag.eventb",
+			"match" : "@[a-zA-Z]\\w*\\b"
+		},
+		"types" : {
+			"name" : "entity.name.type.eventb",
+			"match" : "\\b([A-Z][A-Z0-9_]*)\\b"
+		}
+	},
+	"scopeName": "source.eventb"
+}

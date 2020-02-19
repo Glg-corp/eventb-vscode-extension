@@ -1,0 +1,25 @@
+{
+    "name": "eventb",
+    "displayName": "EventB",
+    "description": "Event B syntax highlighting + autocompletion + snippets",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.42.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "eventb",
+            "aliases": ["Event-B", "eventb"],
+            "extensions": [".bm", ".bc"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "eventb",
+            "scopeName": "source.eventb",
+            "path": "./syntaxes/eventb.tmLanguage.json"
+        }]
+    }
+}
