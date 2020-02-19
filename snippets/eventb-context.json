@@ -1,3 +1,57 @@
 {
-    
+    "context" : {
+        "prefix" : "context",
+        "body" : "context $TM_FILENAME_BASE\n$0\nend",
+        "description" : "Snippet for a context block"
+    },
+    "sets" : {
+        "prefix" : "sets",
+        "body" : "sets ${1:MY_SET}",
+        "description" : "Snippet for a sets block"
+    },
+    "label": {
+        "prefix": "label",
+        "body": "@${1:label}: $0",
+        "description": "Snippet for a label block"
+    },
+    "axioms" : {
+        "prefix" : "axioms",
+        "body" : "axioms\n\t$0",
+        "description" : "Snippet for a axioms block"
+    },
+    "constants" : {
+        "prefix" : "constants",
+        "body": "constants ${1:my_constant}",
+        "description" : "Snippet for a constants block"
+    },
+    "char_arrows": {
+        "prefix": "char_arrows",
+        "body": "${1|⇒,⇔,↦,→,↠,↦,,,}",
+        "description": "Arrows chars"
+    },
+    "char_op": {
+        "prefix": "char_operator",
+        "body": "${1|+,−,^,∗,÷,×|}",
+        "description": "Operators chars"
+    },
+    "char_logical": {
+        "prefix": "char_logical_operator",
+        "body": "${1|∧,∨,¬,∀,∃|}",
+        "description": "Logical chars"
+    },
+    "char_set_oper": {
+        "prefix": "char_set_operator",
+        "body": "${1|∈,⊂,⊆,∀,∃,∪,∩,⋂,⋃,⊄,⊈,∉,:∈|}",
+        "description": "Set operators chars"
+    },
+    "char_set": {
+        "prefix": "char_set",
+        "body": "${1|ℕ,ℕ1,ℙ,ℙ1,ℤ,∅|}",
+        "description": "Set chars"
+    },
+    "char_common": {
+        "prefix": "char_common",
+        "body": "${1|≔,≠,≤,≥,¬,∈,∧,∨|}",
+        "description": "Most used chars"
+    }
 }
