@@ -1,64 +1,69 @@
 {
-    "name": "eventb",
-    "displayName": "Event-B Language Support",
-    "icon" : "icon.jpg",
-    "publisher":"GlgCorp", 
-    "description": "Event B syntax highlighting + autocompletion + snippets",
-    "version": "0.0.2",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/martin-danhier/eventb-vscode-extension"
-      },
-    "engines": {
-        "vscode": "^1.42.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "contributes": {
-        "languages": [
-            {
-                "id": "eventb-context",
-                "aliases": [
-                    "Event-B Context File"
-                ],
-                "extensions": [
-                    ".bc"
-                ],
-                "configuration": "./language-configuration.json"
-            },
-            {
-                "id": "eventb-machine",
-                "aliases": [
-                    "Event-B Machine file"
-                ],
-                "extensions": [
-                    ".bm"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "eventb-machine",
-                "scopeName": "source.eventb.machine",
-                "path": "./syntaxes/eventb-machine.tmLanguage.json"
-            },
-            {
-                "language": "eventb-context",
-                "scopeName": "source.eventb.context",
-                "path": "./syntaxes/eventb-context.tmLanguage.json"
-            }
-        ],
-        "snippets": [
-            {
-                "language": "eventb-machine",
-                "path": "./snippets/eventb-machine.json"
-            },
-            {
-                "language": "eventb-context",
-                "path": "./snippets/eventb-context.json"
-            }
-        ]
-    }
+	"name": "eventb",
+	"displayName": "Event-B Language Support",
+	"icon": "icon.jpg",
+	"publisher": "GlgCorp",
+	"description": "Event B syntax highlighting + autocompletion + snippets",
+	"version": "0.0.2",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/martin-danhier/eventb-vscode-extension"
+	},
+	"engines": {
+		"vscode": "^1.42.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "eventb-context",
+				"aliases": [
+					"Event-B Context File"
+				],
+				"extensions": [
+					".bc"
+				],
+				"configuration": "./language-configuration.json"
+			},
+			{
+				"id": "eventb-machine",
+				"aliases": [
+					"Event-B Machine file"
+				],
+				"extensions": [
+					".bm"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "eventb-machine",
+				"scopeName": "source.eventb.machine",
+				"path": "./syntaxes/eventb-machine.tmLanguage.json"
+			},
+			{
+				"language": "eventb-context",
+				"scopeName": "source.eventb.context",
+				"path": "./syntaxes/eventb-context.tmLanguage.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "eventb-machine",
+				"path": "./snippets/eventb-machine.json"
+			},
+			{
+				"language": "eventb-context",
+				"path": "./snippets/eventb-context.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "2973ccc1-039d-45e5-8984-3e5c6cac9c66",
+		"publisherDisplayName": "GlgCorp",
+		"publisherId": "582ccdb4-052f-4ad2-b2a1-774d495b25e8"
+	}
 }

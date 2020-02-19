@@ -5,7 +5,7 @@
                 "inv",
                 "invariants"
             ],
-            "body": "invariants\n\t@${1:label}: ${2:expression}\n\t$0\nend\n",
+            "body": "invariants\n\t@${1:label}: $0\nend\n",
             "description": "Snippet for invariants block"
         },
         "event-then": {
@@ -13,7 +13,7 @@
                 "event-then",
                 "et"
             ],
-            "body": "event ${1:event_name}\nthen\n\t${3:action}\nend\n",
+            "body": "event ${1:event_name}\nthen\n\t$0\nend\n",
             "description" : "Snippet for event-then block"
         },
         "event-where-then": {
@@ -44,8 +44,47 @@
                 "lbl",
                 "label"
             ],
-            "body" : "@${1:label}: ${2:expression}\n$0",
+            "body" : "@${1:label}: $0",
             "description" : "Snippet for a label block"
+        },
+        "variables": {
+            "prefix" : [
+                "var",
+                "variables"
+            ],
+            "body" : "variables ${0:my_var}",
+            "description" : "Snippet for a variables block"
+        },
+        "machine" : {
+            "prefix" : ["mach","machine"],
+            "body" : "machine $TM_FILENAME_BASE\n"
+        },
+        "char_arrows":{
+            "prefix" : "char_arrows",
+            "body":"${1|⇒,⇔,↦,→,↠,↦,,,}"
+        },
+        "char_op" : {
+            "prefix" : "char_op",
+            "body" : "${1|+,−,^,∗,÷,×|}"
+        },
+
+        "char_logical":{
+            "prefix": "char_logical",
+            "body":"${1|∧,∨,¬,∀,∃|}"
+        },
+        "char_set_oper" : {
+            "prefix" : [
+                "char_set_oper"
+            ],
+            "body" : "${1|∈,⊂,⊆,∀,∃,∪,∩,⋂,⋃,⊄,⊈,∉,:∈|}"
+        },
+        "char_set" : {
+            "prefix" : "char_set",
+            "body" : "${1|ℕ,ℕ1,ℙ,ℙ1,ℤ,∅|}"
+        },
+        "char_common" : {
+            "prefix" : "char_common",
+            "body" : "${1|≔,≠,≤,≥,¬,∈,∧,∨|}"
         }
     }
 }
