@@ -15,6 +15,11 @@
 	"categories": [
 		"Programming Languages"
 	],
+	"activationEvents": [
+		"onLanguage:eventb-machine",
+		"onLanguage:eventb-context"
+	],
+	"main": "./client/src/extension",
 	"contributes": {
 		"languages": [
 			{
