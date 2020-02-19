@@ -1,6 +1,7 @@
 {
     "name": "eventb",
     "displayName": "EventB",
+    "icon" : "icon.jpg",
     "description": "Event B syntax highlighting + autocompletion + snippets",
     "version": "0.0.1",
     "engines": {
