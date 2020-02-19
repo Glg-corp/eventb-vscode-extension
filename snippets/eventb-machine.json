@@ -5,8 +5,47 @@
                 "inv",
                 "invariants"
             ],
-            "body": "invariants\n\t@${1:label}: ${2:${michel}}\nend\n",
+            "body": "invariants\n\t@${1:label}: ${2:expression}\n\t$0\nend\n",
             "description": "Snippet for invariants block"
+        },
+        "event-then": {
+            "prefix": [
+                "event-then",
+                "et"
+            ],
+            "body": "event ${1:event_name}\nthen\n\t${3:action}\nend\n",
+            "description" : "Snippet for event-then block"
+        },
+        "event-where-then": {
+            "prefix" : [
+                "event-where-then",
+                "ewt"
+            ],
+            "body" : "event ${1:event_name}\nwhere\n\t${2:@guard: my_guard}\nthen\n\t${3:@action: my_action}\nend\n",
+            "description" : "Snippet for event-where-then block"
+        },
+        "event-any-where-then": {
+            "prefix" : [
+                "event-any-where-then",
+                "eawt"
+            ],
+            "body" : "event ${1:event_name}\nany ${2:parameter}\nwhere\n\t${3:@guard: my_guard}\nthen\n\t${3:@action: my_action}\nend\n",
+            "description" : "Snippet for event-any-where-then block"            
+        },
+        "block" : {
+            "prefix" : [
+                "block"
+            ],
+            "body" : "${1|invariants,events,event|}\n\t$0\nend\n",
+            "description" : "Snippet for a generic block"
+        },
+        "label" : {
+            "prefix" : [
+                "lbl",
+                "label"
+            ],
+            "body" : "@${1:label}: ${2:expression}\n$0",
+            "description" : "Snippet for a label block"
         }
     }
 }
