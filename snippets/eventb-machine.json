@@ -1,0 +1,12 @@
+{
+    "source.eventb.machine": {
+        "invariants": {
+            "prefix": [
+                "inv",
+                "invariants"
+            ],
+            "body": "invariants\n\t@${1:label}: ${2:${michel}}\nend\n",
+            "description": "Snippet for invariants block"
+        }
+    }
+}

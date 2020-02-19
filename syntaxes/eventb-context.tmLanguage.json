@@ -1,6 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "Event-B",
+	"name": "Event-B Context",
 	"patterns": [
 		{
 			"include": "#keywords"
@@ -22,7 +22,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.eventb",
-				"match": "\\b(machine|variables|invariants|events|where|then|end|any|sets|constants|axioms|refines|sees|with|theorem|extends)\\b"
+				"match": "\\b(context|events|end|any|sets|constants|axioms|theorem)\\b"
 			}]
 		},
 		"comments": {
@@ -50,5 +50,5 @@
 			"match" : "\\b([A-Z][A-Z0-9_]*)\\b"
 		}
 	},
-	"scopeName": "source.eventb"
+	"scopeName": "source.eventb.context"
 }

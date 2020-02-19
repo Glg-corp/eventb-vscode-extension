@@ -10,16 +10,49 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "eventb",
-            "aliases": ["Event-B", "eventb"],
-            "extensions": [".bm", ".bc"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "eventb",
-            "scopeName": "source.eventb",
-            "path": "./syntaxes/eventb.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "eventb-context",
+                "aliases": [
+                    "Event-B Context File"
+                ],
+                "extensions": [
+                    ".bc"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "eventb-machine",
+                "aliases": [
+                    "Event-B Machine file"
+                ],
+                "extensions": [
+                    ".bm"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "eventb-machine",
+                "scopeName": "source.eventb.machine",
+                "path": "./syntaxes/eventb-machine.tmLanguage.json"
+            },
+            {
+                "language": "eventb-context",
+                "scopeName": "source.eventb.context",
+                "path": "./syntaxes/eventb-context.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "eventb-machine",
+                "path": "./snippets/eventb-machine.json"
+            },
+            {
+                "language": "eventb-context",
+                "path": "./snippets/eventb-context.json"
+            }
+        ]
     }
 }
