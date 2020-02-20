@@ -7,13 +7,13 @@ Hello UNamur students!
 ## Installation
 
 1. In Rodin, install the "Camille text editor" plug-in.
-2. Install this extension
+2. Install this extension.
 
 ## Usage
 
 1. You can create and edit `.bc` (context) and `.bm` (machine) files in Visual Studio with this extension.
-2. When you feel like testing your code, copy/paste it in the *Camille* editor of Rodin and hit CTRL+S
-3. You can now use Rodin to test your code
+2. When you feel like testing your code, copy/paste it in the *Camille* editor of Rodin and hit CTRL+S.
+3. You can now use Rodin to test your code.
 
 ## Symbols
 
@@ -23,5 +23,5 @@ The keyword of a symbol is often its English name (ex: *for all*), its most comm
 
 ## Upcoming features
 
-- More accurate autocompletion
-- Commands to create files
+- More accurate autocompletion.
+- Commands to create files.
