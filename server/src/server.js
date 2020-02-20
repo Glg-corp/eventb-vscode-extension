@@ -547,6 +547,14 @@ connection.onCompletion((_textDocumentPosition) => {
             label: 'events',
             kind: vscode_languageserver.CompletionItemKind.Keyword
         },
+        {
+            label: 'convergent',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'anticipated',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
 
         // == misc ==
         {

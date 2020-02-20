@@ -22,7 +22,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.eventb",
-				"match": "\\b(machine|variables|event|invariants|events|where|then|end|any|refines|sees|with|theorem|extends)\\b"
+				"match": "\\b(machine|variables|event|convergent|anticipated|invariants|events|where|then|end|any|refines|sees|with|theorem|extends)\\b"
 			}]
 		},
 		"comments": {
