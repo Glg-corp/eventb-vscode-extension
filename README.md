@@ -1,6 +1,6 @@
 # Langage support for Event-B
 
-[![GitHub](https://img.shields.io/github/stars/glg-corp/eventb-vscode-extension.svg?style=flat-square)](https://github.com/glg-corp/eventb-vscode-extension) [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/installs-short/glgcorp.eventb.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=glgcorp.eventb)
+[![GitHub](https://img.shields.io/github/stars/glg-corp/eventb-vscode-extension.svg)](https://github.com/glg-corp/eventb-vscode-extension) [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/installs-short/glgcorp.eventb.svg)](https://marketplace.visualstudio.com/items?itemName=glgcorp.eventb)
 
 Hello UNamur students!
 
