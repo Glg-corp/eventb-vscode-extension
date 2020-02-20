@@ -491,8 +491,68 @@ connection.onCompletion((_textDocumentPosition) => {
             insertText : '⊥'
         },
 
-        // == Event-B keywords ==
+        // == Event-B constants ==
+        {
+            label: 'FALSE',
+            kind: vscode_languageserver.CompletionItemKind.Constant
+        },
+        {
+            label: 'TRUE',
+            kind: vscode_languageserver.CompletionItemKind.Constant
+        },
 
+        // == Event-B keywords ==
+        {
+            label: 'extends',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'theorem',
+            kind: vscode_languageserver.CompletionItemKind.Keyword,
+            insertText: 'theorem '
+        },
+        {
+            label: 'refines',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'sees',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'with',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'where',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'any',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'then',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'end',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'variables',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+        {
+            label: 'events',
+            kind: vscode_languageserver.CompletionItemKind.Keyword
+        },
+
+        // == misc ==
+        {
+            label: 'BOOL',
+            kind: vscode_languageserver.CompletionItemKind.Class,
+        },
 
         ];
 });

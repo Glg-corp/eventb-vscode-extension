@@ -20,20 +20,10 @@
             "body": "event ${1:event_name}\nany $0\nwhere\n\t\nthen\n\t\nend",
             "description": "Snippet for event-any-where-then block"
         },
-        "events": {
-            "prefix": "events",
-            "body": "events\n\t$0",
-            "description": "Snippet for a generic block"
-        },
         "label": {
             "prefix": "label",
             "body": "@${1:label}: $0",
             "description": "Snippet for a label block"
-        },
-        "variables": {
-            "prefix": "variables",
-            "body": "variables ${0:my_var}",
-            "description": "Snippet for a variables block"
         },
         "init": {
             "prefix": "init",
