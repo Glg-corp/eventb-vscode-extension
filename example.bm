@@ -1,0 +1,28 @@
+machine example extends exemple_1 sees mon_contexte
+variables var1 var2
+invariants
+    @inv1: var1 ∈ ℕ
+    @inv2: var2 ∈ ℕ1
+events
+    event INITIALISATION
+    then
+        @act1: var1 ≔ 2
+        @act2: var2 ≔ 10
+    end
+
+    event set_var_1
+    any param
+    where
+        @grd1: param ∈ ℕ
+        @grd2: param ≠ var1
+    then
+        @act1: var1 ≔ param
+    end
+
+    anticipated event bob extends michel
+    with
+        @wit1: param > 2 ⇔ var1 ≠ 4 // ceci n'a aucun sens, c'est juste pour tester les différents mots-clés
+    then
+        @act2: bonjour
+    end
+end
