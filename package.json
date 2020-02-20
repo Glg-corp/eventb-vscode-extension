@@ -3,7 +3,7 @@
 	"displayName": "Event-B Language Support",
 	"icon": "icon.jpg",
 	"publisher": "GlgCorp",
-	"description": "Event B syntax highlighting, autocompletion and snippets",
+	"description": "Event-B syntax highlighting, autocompletion and snippets",
 	"version": "0.0.2",
 	"repository": {
 		"type": "git",
