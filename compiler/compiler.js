@@ -1,31 +1,62 @@
 parser = require('./machine_grammar');
 fs = require('fs');
 builder = require("xmlbuilder");
-builder = require("process");
+process = require("process");
 
 
 function compile(file) {
-    console.log(`[Event-B] Current directory : ${process.cwd()}`)
-    fs.readFile(file, 'utf8', (err, data) => {
-        if (err) {
-            console.log(`[Event-B] ${err}`);
-        }
-        else {
+    if (getExtension(file) === 'bm') {
+        try {
+            data = fs.readFileSync(file, 'utf8');
+
             console.log(`[Event-B] ${file} opened successfully.`);
+            let result;
+
             result = parser.parse(data);
-            exportToXML(result, file);
+
+            let directory = ""
+            let separator = '/'
+
+            // windows ?
+            if (file.lastIndexOf('\\') >= 0) {
+                separator = '\\';
+            }
+
+            // get directory for the destination file
+            directory = file.substr(0, file.lastIndexOf(separator) + 1) + "bin";
+            if (!fs.existsSync(directory)) {
+                fs.mkdirSync(directory);
+            }
+            directory += separator;
+
+            exportToXML(result, directory);
         }
-    });
+        catch (exception) {
+            console.log(`[Event-B] Exception during compilation :\n${exception}`);
+
+        }
+    }
+
 }
 
+// from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
+function getExtension(path) {
+    var basename = path.split(/[\\/]/).pop(),  // extract file name from full path ...
+        // (supports `\\` and `/` separators)
+        pos = basename.lastIndexOf(".");       // get last position of `.`
 
-function exportToXML(jsonData) {
+    if (basename === "" || pos < 1)            // if file name is empty or ...
+        return "";                             //  `.` not found (-1) or comes first (0)
+
+    return basename.slice(pos + 1);            // extract extension ignoring `.`
+}
+
+function exportToXML(jsonData, directory) {
 
     let index = 1;
 
     // get file name
-    let fileName = jsonData.name + ".bum";
-    console.log(fileName);
+    let fileName = directory + jsonData.name + ".bum";
 
     // build core file
     xml = builder.create("org.eventb.core.machineFile");
@@ -70,8 +101,6 @@ function exportToXML(jsonData) {
             else if (element.convergence == "anticipated") {
                 convergence = "2";
             }
-
-            console.log(JSON.stringify(element))
 
             // create element
             elem = xml.ele("org.eventb.core.event", { name: index.toString(), "org.eventb.core.generated": "false", "org.eventb.core.convergence": convergence, "org.eventb.core.extended": element.extended.toString(), "org.eventb.core.label": element.name });
@@ -120,6 +149,7 @@ function exportToXML(jsonData) {
 
     let output = xml.end({ pretty: true });
 
+    console.log(`[Event-B] Writing to ${fileName}`)
     fs.writeFile(fileName, output, 'utf8', (err, data) => { });
 }
 

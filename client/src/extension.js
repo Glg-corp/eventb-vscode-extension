@@ -14,15 +14,6 @@ const compiler = require("../../compiler/compiler")
 let client;
 function activate(context) {
 
-    // Register commands
-    const command = 'eventb.compileCurrentFile';
-
-    const commandHandler = (name = 'world') => {
-        compiler.compile(vscode.window.activeTextEditor.document.uri.fsPath);
-    };
-
-    context.subscriptions.push(vscode.commands.registerCommand(command, commandHandler));
-
     // The server is implemented in node
     let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
 
@@ -52,10 +43,20 @@ function activate(context) {
     };
 
     // Create the language client and start the client.
-    client = new vscode_languageclient.LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
+    client = new vscode_languageclient.LanguageClient('eventbLanguageServer', 'Event-B', serverOptions, clientOptions);
 
     // Start the client. This will also launch the server
     client.start();
+
+        // Register commands
+        const command = 'eventb.compileCurrentFile';
+
+        const commandHandler = (name = 'world') => {
+            compiler.compile(vscode.window.activeTextEditor.document.uri.fsPath);
+        };
+    
+        context.subscriptions.push(vscode.commands.registerCommand(command, commandHandler));
+    
 }
 
 

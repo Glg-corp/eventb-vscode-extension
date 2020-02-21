@@ -15,7 +15,7 @@ MachineContent
     }
 
 Variables
-	= "variables"  name:(_ Name)* "\n" {
+	= "variables"  name:(_ Name)* _LB {
     	return name.map(elem => elem[1]);
     }
     
@@ -30,21 +30,21 @@ Sees
     }
     
 Invariants
-	= "invariants" "\n" _ line:Predicate+ {
+	= "invariants" _LB _ line:Predicate+ {
     	return line;
     }
 
 
-Events
-	= "events" "\n" _ events:(Event*) { return events; }
+Events 
+	= "events" _LB _ events:(Event*) { return events; }
     
 Event
-	= convergence:("anticipated" / "convergent")? __ "event" __ name:Name __ refine:(("extends" / "refines") __ Name)?  "\n" _ 
+	= convergence:("anticipated" / "convergent")? __ "event" __ name:Name __ refine:(("extends" / "refines") __ Name)? _LB _ 
     	any:Any? _
         where:Where? _ 
 		withValue:With? _
         then:Then _
-      "end" "\n" _ {
+      "end" _LB _ {
       	let target, extended;
         if (refine) {
         	target = refine[2];
@@ -56,7 +56,7 @@ Event
 // event blocks
 
 Any
-	= "any" name:(_ Name)+ "\n" _ {
+	= "any" name:(_ Name)+ _LB _ {
     	return name.map(elem => elem[1]);
     }
     
@@ -70,36 +70,39 @@ With
     	return line;
     }
     
-Then
+Then 
 	= "then" _ line:Line+ {
     	return line;
    	}
     
 // Base block
     
-Predicate
+Predicate "predicate"
 	= theorem:"theorem"? __ line:Line {
     	return { label: line.label, predicate: line.assignment, theorem: !!theorem}
     }
 
-Line
-	=  "@" label:Name __ assignment:Expression _ {
+Line "label"
+	=  "@" label:Name __ (":" __)? assignment:Expression _ {
     	return { label: label, assignment: assignment }
     }
     
-Comment
-	= $("//" [^\n]*)
+Comment "comment"
+	= "//" comment:$([^\r\n]*) _LB { return comment; }
     
-Expression
-    = value:$([^\n]+) [\n] { return value; }
+Expression "expression"
+    = value:$([^\n\r]+) _LB { return value; }
 
-Name //avoid reserved keywords
+Name "identifier" //avoid reserved keywords
   = !"end" !"invariants" !"events" !"where" !"then" !"with" !"event" name:$([a-zA-Z_] [a-zA-Z_0-9]*) {
   	return name;
   }
-  
-__ "strict whitespace"
+
+__ "whitespace"
 	= [ \t]*
   
-_ "whitespace"
+_LB "line break"
+	= "\r"? "\n"
+
+_ "whitespace or line break"
   = [ \t\n\r]*
