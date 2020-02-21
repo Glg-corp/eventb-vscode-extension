@@ -17,7 +17,8 @@
 	],
 	"activationEvents": [
 		"onLanguage:eventb-machine",
-		"onLanguage:eventb-context"
+		"onLanguage:eventb-context",
+		"onCommand:eventb.initProject"
 	],
 	"main": "./client/src/extension",
 	"contributes": {
@@ -68,9 +69,30 @@
 		"commands": [
 			{
 				"command": "eventb.compileCurrentFile",
-				"title": "Event-B: Compile current file to XML"
+				"title": "Compile current file to XML",
+				"category": "Event-B"
+			},
+			{
+				"command" : "eventb.initProject",
+				"title": "Init Event-B Project",
+				"category": "Event-B"
 			}
-		]
+		],
+		"keybindings" : [
+			{
+				"command": "eventb.compileCurrentFile",
+				"when" : "editorLangId == eventb-machine",
+				"key" : "f5"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+			  {
+				"command": "eventb.compileCurrentFile",
+				"when": "editorLangId == eventb-machine"
+			  }
+			]
+		  }
 	},
 	"__metadata": {
 		"id": "2973ccc1-039d-45e5-8984-3e5c6cac9c66",

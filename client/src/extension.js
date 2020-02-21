@@ -9,7 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const vscode = require("vscode");
 const vscode_languageclient = require("vscode-languageclient");
-const compiler = require("../../compiler/compiler")
+
+const compiler = require("../../compiler/compiler");
+const newProject = require("./new-project");
 
 let client;
 function activate(context) {
@@ -43,20 +45,28 @@ function activate(context) {
     };
 
     // Create the language client and start the client.
-    client = new vscode_languageclient.LanguageClient('eventbLanguageServer', 'Event-B', serverOptions, clientOptions);
+    client = new vscode_languageclient.LanguageClient('eventbLanguageServer', 'Event-B', serverOptions, clientOptions );
 
     // Start the client. This will also launch the server
     client.start();
 
-        // Register commands
-        const command = 'eventb.compileCurrentFile';
+    // == Register commands ==
 
-        const commandHandler = (name = 'world') => {
-            compiler.compile(vscode.window.activeTextEditor.document.uri.fsPath);
-        };
+
+    // init new project
+    context.subscriptions.push(vscode.commands.registerCommand('eventb.initProject', () => {
+        newProject.initProject();
+    }));
     
-        context.subscriptions.push(vscode.commands.registerCommand(command, commandHandler));
-    
+    // compile current file
+    context.subscriptions.push(vscode.commands.registerCommand('eventb.compileCurrentFile', () => {
+        compiler.compile(vscode.window.activeTextEditor.document.uri.fsPath);
+    }));
+
+
+    // register watcher
+    const watcher = vscode.workspace.createFileSystemWatcher("**/*.bm");
+    watcher.onDidChange(handleFileSystemChange, this);
 }
 
 
@@ -70,3 +80,7 @@ function deactivate() {
 }
 
 exports.deactivate = deactivate;
+
+function handleFileSystemChange(uri) {
+    compiler.compile(uri.fsPath);
+}

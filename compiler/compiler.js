@@ -9,7 +9,7 @@ function compile(file) {
         try {
             data = fs.readFileSync(file, 'utf8');
 
-            console.log(`[Event-B] ${file} opened successfully.`);
+            console.log(`[Event-B] Compiling ${file}.`);
             let result;
 
             result = parser.parse(data);
@@ -30,6 +30,8 @@ function compile(file) {
             directory += separator;
 
             exportToXML(result, directory);
+
+            
         }
         catch (exception) {
             console.log(`[Event-B] Exception during compilation :\n${exception}`);
@@ -149,8 +151,7 @@ function exportToXML(jsonData, directory) {
 
     let output = xml.end({ pretty: true });
 
-    console.log(`[Event-B] Writing to ${fileName}`)
-    fs.writeFile(fileName, output, 'utf8', (err, data) => { });
+    fs.writeFileSync(fileName, output, 'utf8');
 }
 
 module.exports = {

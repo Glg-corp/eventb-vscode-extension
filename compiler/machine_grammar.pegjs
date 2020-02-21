@@ -15,7 +15,7 @@ MachineContent
     }
 
 Variables
-	= "variables"  name:(_ Name)* _LB {
+	= "variables"  name:(_ Name)*  {
     	return name.map(elem => elem[1]);
     }
     
