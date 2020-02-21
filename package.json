@@ -64,11 +64,20 @@
 				"language": "eventb-context",
 				"path": "./snippets/eventb-context.json"
 			}
+		],
+		"commands": [
+			{
+				"command": "eventb.compileCurrentFile",
+				"title": "Event-B: Compile current file to XML"
+			}
 		]
 	},
 	"__metadata": {
 		"id": "2973ccc1-039d-45e5-8984-3e5c6cac9c66",
 		"publisherDisplayName": "GlgCorp",
 		"publisherId": "582ccdb4-052f-4ad2-b2a1-774d495b25e8"
+	},
+	"dependencies": {
+		"xmlbuilder": "^14.0.0"
 	}
 }

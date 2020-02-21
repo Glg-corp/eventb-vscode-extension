@@ -1,28 +1,19 @@
-machine example extends exemple_1 sees mon_contexte
-variables var1 var2
+machine example
+variables test
 invariants
-    @inv1: var1 ∈ ℕ
-    @inv2: var2 ∈ ℕ1
+    @inv1 test ∈ BOOL
 events
     event INITIALISATION
     then
-        @act1: var1 ≔ 2
-        @act2: var2 ≔ 10
+        @act1 test ≔ FALSE
     end
 
-    event set_var_1
-    any param
+    event set_test
+    any new_value
     where
-        @grd1: param ∈ ℕ
-        @grd2: param ≠ var1
+        @grd1 new_value ∈ BOOL
+        @grd2 new_value ≠ test
     then
-        @act1: var1 ≔ param
-    end
-
-    anticipated event bob extends michel
-    with
-        @wit1: param > 2 ⇔ var1 ≠ 4 // ceci n'a aucun sens, c'est juste pour tester les différents mots-clés
-    then
-        @act2: bonjour
+        @act1 test ≔ new_value
     end
 end

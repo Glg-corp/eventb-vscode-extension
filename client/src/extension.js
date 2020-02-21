@@ -1,14 +1,27 @@
 "use strict";
 
+
+// Language Client
+
 // forked from sample by Microsoft Corporation.
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
-const vscode_1 = require("vscode");
-const vscode_languageclient_1 = require("vscode-languageclient");
+const vscode = require("vscode");
+const vscode_languageclient = require("vscode-languageclient");
+const compiler = require("../../compiler/compiler")
 
 let client;
 function activate(context) {
+
+    // Register commands
+    const command = 'eventb.compileCurrentFile';
+
+    const commandHandler = (name = 'world') => {
+        compiler.compile(vscode.window.activeTextEditor.document.uri.fsPath);
+    };
+
+    context.subscriptions.push(vscode.commands.registerCommand(command, commandHandler));
 
     // The server is implemented in node
     let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
@@ -20,10 +33,10 @@ function activate(context) {
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
     let serverOptions = {
-        run: { module: serverModule, transport: vscode_languageclient_1.TransportKind.ipc },
+        run: { module: serverModule, transport: vscode_languageclient.TransportKind.ipc },
         debug: {
             module: serverModule,
-            transport: vscode_languageclient_1.TransportKind.ipc,
+            transport: vscode_languageclient.TransportKind.ipc,
             options: debugOptions
         }
     };
@@ -34,12 +47,12 @@ function activate(context) {
         documentSelector: [{ scheme: 'file', language: 'eventb-machine' }, { scheme: 'file', language: 'eventb-context' }],
         synchronize: {
             // Notify the server about file changes to '.clientrc files contained in the workspace
-            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.clientrc')
+            fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
         }
     };
 
     // Create the language client and start the client.
-    client = new vscode_languageclient_1.LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
+    client = new vscode_languageclient.LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
 
     // Start the client. This will also launch the server
     client.start();

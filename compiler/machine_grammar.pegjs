@@ -1,22 +1,22 @@
-// Simple Arithmetics Grammar
+// Event-B Machine file grammar
 // ==========================
-//
-// Accepts expressions like "2 * (3 + 4)" and computes their value.
 
 Machine 
-	= _ "machine" _ name:Name _ content:MachineContent _ "end" _ {
+	= _ "machine" __ name:Name _ content:MachineContent _ "end" _ {
     	return {name:name, content: content};
     }
     
 MachineContent
-	= refines:Refines? _ sees:Sees? _ variables:Variables? _ invariants:Invariants? _ events:Events?
+	= refines:Refines? _ sees:Sees? _ 
+	variables:Variables? _
+	invariants:Invariants? _ events:Events?
     {
     	return {refines: refines, sees: sees, variables: variables, invariants: invariants, events: events};
     }
 
 Variables
-	= "variables" _ name:(Name _)* {
-    	return name.map(elem => elem[0]);
+	= "variables"  name:(_ Name)* "\n" {
+    	return name.map(elem => elem[1]);
     }
     
 Refines
@@ -30,34 +30,34 @@ Sees
     }
     
 Invariants
-	= "invariants" _ line:Predicate+ {
+	= "invariants" "\n" _ line:Predicate+ {
     	return line;
     }
 
 
 Events
-	= "events" _ events:(Event*) { return events; }
+	= "events" "\n" _ events:(Event*) { return events; }
     
 Event
-	= "event" _ name:Name _ refine:(("extends" / "refines") _ Name)? _ 
+	= convergence:("anticipated" / "convergent")? __ "event" __ name:Name __ refine:(("extends" / "refines") __ Name)?  "\n" _ 
     	any:Any? _
         where:Where? _ 
 		withValue:With? _
         then:Then _
-      "end" _ {
+      "end" "\n" _ {
       	let target, extended;
         if (refine) {
         	target = refine[2];
             extended = refine[0] === "extends"
         }
-    	return {name:name, target: target, extended: !!extended, any: any, where: where, with:withValue, then:then }
+    	return {name:name, target: target, convergence: convergence, extended: !!extended, any: any, where: where, with:withValue, then:then }
     }
 
 // event blocks
 
 Any
-	= "any" _ name:(Name _)* {
-    	return name.map(elem => elem[0]);
+	= "any" name:(_ Name)+ "\n" _ {
+    	return name.map(elem => elem[1]);
     }
     
 Where
@@ -78,25 +78,28 @@ Then
 // Base block
     
 Predicate
-	= theorem:"theorem"? _ line:Line {
+	= theorem:"theorem"? __ line:Line {
     	return { label: line.label, predicate: line.assignment, theorem: !!theorem}
     }
 
 Line
-	=  "@" label:Name _ assignment:Expression _ {
+	=  "@" label:Name __ assignment:Expression _ {
     	return { label: label, assignment: assignment }
     }
+    
+Comment
+	= $("//" [^\n]*)
     
 Expression
     = value:$([^\n]+) [\n] { return value; }
 
-Integer "integer"
-  = _ [0-9]+ { return parseInt(text(), 10); }  
-
-Name
-  = !"end" !"invariants" !"events" name:$([a-zA-Z_] [a-zA-Z_0-9]*) {
+Name //avoid reserved keywords
+  = !"end" !"invariants" !"events" !"where" !"then" !"with" !"event" name:$([a-zA-Z_] [a-zA-Z_0-9]*) {
   	return name;
   }
+  
+__ "strict whitespace"
+	= [ \t]*
   
 _ "whitespace"
   = [ \t\n\r]*
