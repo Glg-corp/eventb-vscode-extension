@@ -14,24 +14,25 @@ function compile(file) {
 
             result = parser.parse(data);
 
-            let directory = ""
             let separator = '/'
+            let directory =  vscode.workspace.rootPath;
 
             // windows ?
-            if (file.lastIndexOf('\\') >= 0) {
+            if (directory.lastIndexOf('\\') >= 0) {
                 separator = '\\';
             }
 
-            // get directory for the destination file
-            directory = file.substr(0, file.lastIndexOf(separator) + 1) + "bin";
+            directory += separator + "rodin-project";
+
             if (!fs.existsSync(directory)) {
                 fs.mkdirSync(directory);
             }
+
             directory += separator;
 
             exportToXML(result, directory);
 
-            
+
         }
         catch (exception) {
             console.log(`[Event-B] Exception during compilation :\n${exception}`);
