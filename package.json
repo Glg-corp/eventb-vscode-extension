@@ -3,8 +3,8 @@
 	"displayName": "Event-B Language Support",
 	"icon": "icon.jpg",
 	"publisher": "GlgCorp",
-	"description": "Event-B syntax highlighting, autocompletion and snippets",
-	"version": "1.0.0",
+	"description": "Event-B compiler, autocompletion, syntax highlighting, and snippets",
+	"version": "2.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/glg-corp/eventb-vscode-extension"
@@ -17,7 +17,8 @@
 	],
 	"activationEvents": [
 		"onLanguage:eventb-machine",
-		"onLanguage:eventb-context"
+		"onLanguage:eventb-context",
+		"onCommand:eventb.initProject"
 	],
 	"main": "./client/src/extension",
 	"contributes": {
@@ -64,11 +65,41 @@
 				"language": "eventb-context",
 				"path": "./snippets/eventb-context.json"
 			}
-		]
+		],
+		"commands": [
+			{
+				"command": "eventb.compileCurrentFile",
+				"title": "Compile current file to XML",
+				"category": "Event-B"
+			},
+			{
+				"command" : "eventb.initProject",
+				"title": "Init Event-B Project",
+				"category": "Event-B"
+			}
+		],
+		"keybindings" : [
+			{
+				"command": "eventb.compileCurrentFile",
+				"when" : "editorLangId == eventb-machine",
+				"key" : "f5"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+			  {
+				"command": "eventb.compileCurrentFile",
+				"when": "editorLangId == eventb-machine"
+			  }
+			]
+		  }
 	},
 	"__metadata": {
 		"id": "2973ccc1-039d-45e5-8984-3e5c6cac9c66",
 		"publisherDisplayName": "GlgCorp",
 		"publisherId": "582ccdb4-052f-4ad2-b2a1-774d495b25e8"
+	},
+	"dependencies": {
+		"xmlbuilder": "^14.0.0"
 	}
 }

@@ -1,0 +1,19 @@
+machine example
+variables test
+invariants
+    @inv1 test ∈ BOOL
+events
+    event INITIALISATION
+    then
+        @act1 test ≔ FALSE
+    end
+
+    event set_test
+    any new_value
+    where
+        @grd1 new_value ∈ BOOL
+        @grd2 new_value ≠ test
+    then
+        @act1 test ≔ new_value
+    end
+end

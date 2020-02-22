@@ -2,7 +2,7 @@
     "source.eventb.machine": {
         "invariants": {
             "prefix": "invariants",
-            "body": "invariants\n\t@${1:label}: $0",
+            "body": "invariants\n\t@${1:label} $0",
             "description": "Snippet for invariants block"
         },
         "event-then": {
@@ -22,7 +22,7 @@
         },
         "label": {
             "prefix": "label",
-            "body": "@${1:label}: $0",
+            "body": "@${1:label} $0",
             "description": "Snippet for a label block"
         },
         "init": {
