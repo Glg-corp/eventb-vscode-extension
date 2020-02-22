@@ -2,8 +2,14 @@
 
 All notable changes to the "eventb" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## 2.0.0
 
-## [Unreleased]
+- Added a built-in compiler for Event-B machine files.
+- Added some commands in the command palette (not completely finished)
+- Bugfixes
 
-- Initial release
+## 1.0.0
+
+- Added Language Server for autocompletion
+- Refined snippets
+- Added syntax highlighting

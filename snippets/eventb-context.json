@@ -11,7 +11,7 @@
     },
     "label": {
         "prefix": "label",
-        "body": "@${1:label}: $0",
+        "body": "@${1:label} $0",
         "description": "Snippet for a label block"
     },
     "axioms" : {

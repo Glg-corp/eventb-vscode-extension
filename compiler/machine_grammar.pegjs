@@ -8,7 +8,7 @@ Machine
     
 MachineContent
 	= refines:Refines? _ sees:Sees? _ 
-	variables:Variables? _
+	variables:(v:Variables _LB {return v})? _
 	invariants:Invariants? _ events:Events?
     {
     	return {refines: refines, sees: sees, variables: variables, invariants: invariants, events: events};
@@ -88,10 +88,10 @@ Line "label"
     }
     
 Comment "comment"
-	= "//" comment:$([^\r\n]*) _LB { return comment; }
+	= "//" comment:$([^\r\n]*) (_LB / EOF ) { return comment; }
     
 Expression "expression"
-    = value:$([^\n\r]+) _LB { return value; }
+    = value:$(([^\n\r]  !"//" )+) _LB { return value; }
 
 Name "identifier" //avoid reserved keywords
   = !"end" !"invariants" !"events" !"where" !"then" !"with" !"event" name:$([a-zA-Z_] [a-zA-Z_0-9]*) {
@@ -102,7 +102,10 @@ __ "whitespace"
 	= [ \t]*
   
 _LB "line break"
-	= "\r"? "\n"
+	= __ ( Comment / "\r"? "\n")
 
 _ "whitespace or line break"
-  = [ \t\n\r]*
+  = ( Comment / [ \t\n\r] )*
+  
+EOF "end of file"
+	= !.
