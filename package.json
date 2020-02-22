@@ -73,26 +73,47 @@
 				"category": "Event-B"
 			},
 			{
-				"command" : "eventb.initProject",
+				"command": "eventb.initProject",
 				"title": "New Project",
+				"category": "Event-B"
+			},
+			{
+				"command": "eventb.openInRodin",
+				"title": "Open in Rodin Platform",
 				"category": "Event-B"
 			}
 		],
-		"keybindings" : [
+		"keybindings": [
 			{
 				"command": "eventb.compileCurrentFile",
-				"when" : "editorLangId == eventb-machine",
-				"key" : "f5"
+				"when": "editorLangId == eventb-machine",
+				"key": "f5"
 			}
 		],
 		"menus": {
 			"commandPalette": [
-			  {
-				"command": "eventb.compileCurrentFile",
-				"when": "editorLangId == eventb-machine"
-			  }
+				{
+					"command": "eventb.compileCurrentFile",
+					"when": "editorLangId == eventb-machine"
+				},
+				{
+					"command": "eventb.openInRodin",
+					"when": "eventb:project_loaded"
+				}
 			]
-		  }
+		},
+		"configuration": {
+			"type": "object",
+			"title": "Event-B",
+			"properties": {
+				"eventb.pathToRodinExecutable": {
+					"type": "string",
+					"default": "rodin",
+					"description": "Path to the rodin executable.",
+					"scope": "window"
+				}
+			}
+		}
 	},
 	"__metadata": {
 		"id": "2973ccc1-039d-45e5-8984-3e5c6cac9c66",

@@ -9,13 +9,47 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const vscode = require("vscode");
 const vscode_languageclient = require("vscode-languageclient");
+const fs = require('fs');
 
 const compiler = require("../../compiler/compiler");
 const newProject = require("./new-project");
+const openInRodin = require("./open-in-rodin");
+
+const EVENTB_PROJECT_LOADED = "eventb:project_loaded";
 
 let client;
 function activate(context) {
 
+    startLanguageServer(context);
+
+    registerCommands(context);
+
+    setCommandVisibility();
+    // recheck command visibility if the workspace changes
+    vscode.workspace.onDidChangeWorkspaceFolders((event) => { setCommandVisibility(); });
+
+    // register watcher
+    const watcher = vscode.workspace.createFileSystemWatcher("**/*.bm");
+    watcher.onDidChange(handleFileSystemChange, this);
+}
+
+
+exports.activate = activate;
+
+function deactivate() {
+    if (!client) {
+        return undefined;
+    }
+    return client.stop();
+}
+
+exports.deactivate = deactivate;
+
+function handleFileSystemChange(uri) {
+    compiler.compile(uri.fsPath);
+}
+
+function startLanguageServer(context) {
     // The server is implemented in node
     let serverModule = context.asAbsolutePath(path.join('server', 'src', 'server.js'));
 
@@ -45,42 +79,48 @@ function activate(context) {
     };
 
     // Create the language client and start the client.
-    client = new vscode_languageclient.LanguageClient('eventbLanguageServer', 'Event-B', serverOptions, clientOptions );
+    client = new vscode_languageclient.LanguageClient('eventbLanguageServer', 'Event-B', serverOptions, clientOptions);
 
     // Start the client. This will also launch the server
     client.start();
+}
 
-    // == Register commands ==
-
+function registerCommands(context) {
 
     // init new project
     context.subscriptions.push(vscode.commands.registerCommand('eventb.initProject', () => {
         newProject.initProject();
     }));
-    
+
     // compile current file
     context.subscriptions.push(vscode.commands.registerCommand('eventb.compileCurrentFile', () => {
         compiler.compile(vscode.window.activeTextEditor.document.uri.fsPath);
     }));
 
+    // open in rodin
+    context.subscriptions.push(vscode.commands.registerCommand('eventb.openInRodin', () => {
+        openInRodin.openInRodin();
+    }));
 
-    // register watcher
-    const watcher = vscode.workspace.createFileSystemWatcher("**/*.bm");
-    watcher.onDidChange(handleFileSystemChange, this);
 }
 
+function setCommandVisibility() {
 
-exports.activate = activate;
+    // load workspace data
+    let separator = '/'
+    let directory = vscode.workspace.rootPath;
 
-function deactivate() {
-    if (!client) {
-        return undefined;
+    // windows ?
+    if (directory.lastIndexOf('\\') >= 0) {
+        separator = '\\';
     }
-    return client.stop();
-}
 
-exports.deactivate = deactivate;
+    // is a workspace opened ?
+    const workspaceOpened = !!directory;
 
-function handleFileSystemChange(uri) {
-    compiler.compile(uri.fsPath);
+    // only show commands in a rodin project (workspace opened, and there is a .metadata folder and a rodin-project folder)
+    const shouldShowCommands = workspaceOpened && fs.existsSync(directory + separator + ".metadata") && fs.existsSync(directory + separator + "rodin-project");
+    console.log(shouldShowCommands);
+
+    vscode.commands.executeCommand("setContext", EVENTB_PROJECT_LOADED, shouldShowCommands);
 }

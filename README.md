@@ -30,4 +30,3 @@ The keyword of a symbol is often its English name (ex: *for all*), its most comm
 - Commands to create files.
 - Compiler for context files.
 - Syntax error preview in editor.
-- More simple and automated "new project" command and instructions
