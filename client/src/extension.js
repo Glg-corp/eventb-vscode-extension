@@ -120,7 +120,6 @@ function setCommandVisibility() {
 
     // only show commands in a rodin project (workspace opened, and there is a .metadata folder and a rodin-project folder)
     const shouldShowCommands = workspaceOpened && fs.existsSync(directory + separator + ".metadata") && fs.existsSync(directory + separator + "rodin-project");
-    console.log(shouldShowCommands);
 
     vscode.commands.executeCommand("setContext", EVENTB_PROJECT_LOADED, shouldShowCommands);
 }
