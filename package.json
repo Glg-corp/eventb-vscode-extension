@@ -4,7 +4,7 @@
 	"icon": "icon.jpg",
 	"publisher": "GlgCorp",
 	"description": "Event-B compiler, autocompletion, syntax highlighting, and snippets",
-	"version": "2.0.0",
+	"version": "3.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/glg-corp/eventb-vscode-extension"
@@ -73,26 +73,26 @@
 				"category": "Event-B"
 			},
 			{
-				"command" : "eventb.initProject",
+				"command": "eventb.initProject",
 				"title": "Init Event-B Project",
 				"category": "Event-B"
 			}
 		],
-		"keybindings" : [
+		"keybindings": [
 			{
 				"command": "eventb.compileCurrentFile",
-				"when" : "editorLangId == eventb-machine",
-				"key" : "f5"
+				"when": "editorLangId == eventb-machine",
+				"key": "f5"
 			}
 		],
 		"menus": {
 			"commandPalette": [
-			  {
-				"command": "eventb.compileCurrentFile",
-				"when": "editorLangId == eventb-machine"
-			  }
+				{
+					"command": "eventb.compileCurrentFile",
+					"when": "editorLangId == eventb-machine"
+				}
 			]
-		  }
+		}
 	},
 	"__metadata": {
 		"id": "2973ccc1-039d-45e5-8984-3e5c6cac9c66",
