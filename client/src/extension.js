@@ -66,6 +66,7 @@ function startLanguageServer(context) {
             transport: vscode_languageclient.TransportKind.ipc,
             options: debugOptions
         }
+        
     };
 
     // Options to control the language client
@@ -122,4 +123,5 @@ function setCommandVisibility() {
     const shouldShowCommands = workspaceOpened && fs.existsSync(directory + separator + ".metadata") && fs.existsSync(directory + separator + "rodin-project");
 
     vscode.commands.executeCommand("setContext", EVENTB_PROJECT_LOADED, shouldShowCommands);
+
 }

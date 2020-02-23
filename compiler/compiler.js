@@ -2,7 +2,7 @@ parser = require('./machine_grammar');
 fs = require('fs');
 builder = require("xmlbuilder");
 process = require("process");
-
+vscode = require("vscode");
 
 function compile(file) {
     if (getExtension(file) === 'bm') {
@@ -10,12 +10,12 @@ function compile(file) {
             data = fs.readFileSync(file, 'utf8');
 
             console.log(`[Event-B] Compiling ${file}.`);
-            let result;
 
             result = parser.parse(data);
 
+
             let separator = '/'
-            let directory =  vscode.workspace.rootPath;
+            let directory = vscode.workspace.rootPath;
 
             // windows ?
             if (directory.lastIndexOf('\\') >= 0) {
@@ -155,6 +155,4 @@ function exportToXML(jsonData, directory) {
     fs.writeFileSync(fileName, output, 'utf8');
 }
 
-module.exports = {
-    compile: (file) => { compile(file); }
-}
+exports.compile = compile;

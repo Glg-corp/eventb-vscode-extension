@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<org.eventb.core.machineFile version="5" org.eventb.core.configuration="org.eventb.core.fwd" org.eventb.core.generated="false">
+  <org.eventb.core.variable name="1" org.eventb.core.generated="false" org.eventb.core.identifier="test"/>
+  <org.eventb.core.invariant name="2" org.eventb.core.generated="false" org.eventb.core.label="inv1" org.eventb.core.predicate="test ∈ BOOL" org.eventb.core.theorem="false"/>
+  <org.eventb.core.event name="3" org.eventb.core.generated="false" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="INITIALISATION">
+    <org.eventb.core.action name="4" org.eventb.core.generated="false" org.eventb.core.label="act1" org.eventb.core.assignment="test ≔ FALSE"/>
+  </org.eventb.core.event>
+  <org.eventb.core.event name="5" org.eventb.core.generated="false" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="set_test">
+    <org.eventb.core.parameter name="6" org.eventb.core.generated="false" org.eventb.core.identifier="new_value"/>
+    <org.eventb.core.guard name="7" org.eventb.core.generated="false" org.eventb.core.label="grd1" org.eventb.core.predicate="new_value ∈ BOOL" org.eventb.core.theorem="false"/>
+    <org.eventb.core.guard name="8" org.eventb.core.generated="false" org.eventb.core.label="grd2" org.eventb.core.predicate="new_value ≠ test" org.eventb.core.theorem="false"/>
+    <org.eventb.core.action name="9" org.eventb.core.generated="false" org.eventb.core.label="act1" org.eventb.core.assignment="test ≔ new_value"/>
+  </org.eventb.core.event>
+</org.eventb.core.machineFile>
