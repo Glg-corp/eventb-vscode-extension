@@ -44,7 +44,7 @@ Event
         where:Where? _ 
 		withValue:With? _
         then:Then _
-      "end" _LB _ {
+      "end"  _ {
       	let target, extended;
         if (refine) {
         	target = refine[2];

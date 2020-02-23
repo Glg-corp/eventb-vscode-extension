@@ -1,4 +1,4 @@
-{
+A{
 	"name": "eventb",
 	"displayName": "Event-B Language Support",
 	"icon": "icon.jpg",
@@ -74,7 +74,16 @@
 			},
 			{
 				"command": "eventb.initProject",
+<<<<<<< HEAD
 				"title": "Init Event-B Project",
+=======
+				"title": "New Project",
+				"category": "Event-B"
+			},
+			{
+				"command": "eventb.openInRodin",
+				"title": "Open in Rodin Platform",
+>>>>>>> 34ab639e86c079176289d48c3dc9cd5b9aaee0cd
 				"category": "Event-B"
 			}
 		],
@@ -90,8 +99,24 @@
 				{
 					"command": "eventb.compileCurrentFile",
 					"when": "editorLangId == eventb-machine"
+				},
+				{
+					"command": "eventb.openInRodin",
+					"when": "eventb:project_loaded"
 				}
 			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "Event-B",
+			"properties": {
+				"eventb.pathToRodinExecutable": {
+					"type": "string",
+					"default": "rodin",
+					"description": "Path to the rodin executable.",
+					"scope": "window"
+				}
+			}
 		}
 	},
 	"__metadata": {

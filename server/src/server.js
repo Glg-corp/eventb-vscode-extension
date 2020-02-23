@@ -1,13 +1,15 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const vscode_languageserver = require('vscode-languageserver');
+const vsls = require('vscode-languageserver');
+const parser = require("../../compiler/machine_grammar");
+
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
-let connection = vscode_languageserver.createConnection(vscode_languageserver.ProposedFeatures.all);
+let connection = vsls.createConnection(vsls.ProposedFeatures.all);
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
-let documents = new vscode_languageserver.TextDocuments();
+let documents = new vsls.TextDocuments();
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
@@ -41,7 +43,7 @@ connection.onInitialize((params) => {
 connection.onInitialized(() => {
     if (hasConfigurationCapability) {
         // Register for all configuration changes.
-        connection.client.register(vscode_languageserver.DidChangeConfigurationNotification.type, undefined);
+        connection.client.register(vsls.DidChangeConfigurationNotification.type, undefined);
     }
     if (hasWorkspaceFolderCapability) {
         connection.workspace.onDidChangeWorkspaceFolders(_event => {
@@ -51,28 +53,9 @@ connection.onInitialized(() => {
 })
 
 
-// The global settings, used when the `workspace/configuration` request is not supported by the client.
-// Please note that this is not the case when using this server with the client provided in this example
-// but could happen with other clients.
-const defaultSettings = { maxNumberOfProblems: 1000 };
-let globalSettings = defaultSettings;
 
 // Cache the settings of all open documents
 let documentSettings = new Map();
-
-connection.onDidChangeConfiguration(change => {
-    if (hasConfigurationCapability) {
-        // Reset all cached document settings
-        documentSettings.clear();
-    } else {
-        globalSettings = (
-            (change.settings.languageServerExample || defaultSettings)
-        );
-    }
-
-    // Revalidate all open text documents
-    documents.all().forEach(validateTextDocument);
-});
 
 function getDocumentSettings(resource) {
     if (!hasConfigurationCapability) {
@@ -102,8 +85,134 @@ documents.onDidChangeContent(change => {
 
 async function validateTextDocument(textDocument) {
 
+    let text = textDocument.getText();
+
+    console.log(textDocument);
+
+    let diagnostics = [];
+
+    // Syntax analysis
+    try {
+        parser.parse(text);
+    }
+    catch (err) {
+
+        const wordStart = err.location.start.offset;
+        const wordEnd = getLastCharIndexOfWordAt(text, wordStart);
+        const word = text.slice(wordStart, wordEnd);
+
+        let diagnostic = {
+            severity: vsls.DiagnosticSeverity.Error,
+            range: {
+                start: textDocument.positionAt(wordStart),
+                end: textDocument.positionAt(wordEnd)
+            },
+            message: err.name + ": " + err.message.replace(/(?<=but ").(?=" found.)/, word)
+        };
+        if (hasDiagnosticRelatedInformationCapability) {
+            diagnostic.relatedInformation = [];
+            let message;
+
+            // try to detect most frequent bugs and hint the programmer to the solution
+
+            if (err.message.includes(`Expected "anticipated", "convergent", "end", or "event" but end of input found`)) {
+                message = "Did you forget an \"end\" at the end of the file ?";
+            }
+            else if (err.message.includes(`Expected predicate but`) && word == "then") {
+                message = "Provide predicates in the \"where\" section or remove the \"where\" keyword.";
+            }
+            else if (err.message.includes("label") && word == "end") {
+                message = "You must provide at least one action.";
+            }
+            else if (err.message.includes(`Expected "end" or label`) && word == "with") {
+                message = `The "with" block goes above the "then" block.`;
+            }
+            else if (err.message.includes(`Expected label but`) && word == "then") {
+                message = `Please provide at least one predicate, or remove the block.`;
+            }
+            else if ((err.message.includes(`label`) || err.message.includes(`predicate`)) && word[0] == "@") {
+                message = `Please provide an expression after the label.`;
+            }
+            else if (err.message.includes(`Expected identifier but`) && word == "invariants") {
+                message = `Please insert a line break between "variables" and "invariants".`;
+            }
+            else if (err.message.includes(`Expected identifier but`) && (word == "where" || word == "then" || word == "with" || word == "end")) {
+                message = `Please provide at least one parameter or remove the "any" block.`;
+            }
+            else if (err.message.includes(`Expected "machine"`)) {
+                message = `What are you even trying to do? A file should start with "machine" (see machine snippet)`;
+            }
+            else if (err.message.includes("label") && word != "events" && word != "end" && word != "with") {
+                message = "Did you forget to put a @tag before your line ?";
+            }
+            else if (err.message.includes(`Expected predicate but`) && word != "events" && word != "end" && word != "with") {
+                message = "Did you forget to put a @tag before your predicate ?";
+            }
+
+            // save related information
+            if (message) {
+                diagnostic.relatedInformation.push({
+                    location: {
+                        uri: textDocument.uri,
+                        range: Object.assign({}, diagnostic.range)
+                    },
+                    message: message
+                });
+            }
+
+
+        }
+        diagnostics.push(diagnostic);
+    }
+
+    // check if there is a INITIALISATION event
+    if (/\bevent\b +\bINITIALISATION\b[ \t\r\n]*\bthen\b(?:[ \t\r\n]*.*(?=end))*\bend\b/s.exec(text) == null) {
+        let diagnostic = {
+            severity: vsls.DiagnosticSeverity.Warning,
+            range: {
+                start: textDocument.positionAt(0),
+                end: textDocument.positionAt(0)
+            },
+            message: "The machine does not have an INITIALISATION event."
+        };
+
+        if (hasDiagnosticRelatedInformationCapability) {
+            diagnostic.relatedInformation = [{
+                location: {
+                    uri: textDocument.uri,
+                    range: Object.assign({}, diagnostic.range)
+                },
+                message: "You can create one easily with the \"init\" snippet."
+            }]
+        }
+        diagnostics.push(diagnostic);
+
+    }
+
+    // Send the computed diagnostics to VS Code.
+    connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
+
+function getLastCharIndexOfWordAt(str, pos) {
+
+    // Perform type conversions.
+    str = String(str);
+    pos = Number(pos) >>> 0;
+
+    // Search for the word's end.
+    var right = str.slice(pos).search(/\s/);
+
+    // The last word in the string is a special case.
+    if (right < 0) {
+        return str.length;
+    }
+
+
+
+    // Return the word, using the located bounds to extract it from the string.
+    return right + pos;
+}
 
 
 // This handler provides the initial list of the completion items.
@@ -116,469 +225,469 @@ connection.onCompletion((_textDocumentPosition) => {
         // Operators
         {
             label: 'Assignation ≔',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'assign',
-            insertText : '≔'
+            insertText: '≔'
         },
         {
             label: 'Division ÷',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'divide',
-            insertText : '÷'
+            insertText: '÷'
         },
         {
             label: 'Multiplication ∗',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'multiply',
-            insertText : '∗'
+            insertText: '∗'
         },
         {
             label: 'Subtraction −',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'minus',
-            insertText : '−'
+            insertText: '−'
         },
         {
             label: 'Addition +',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'plus',
-            insertText : '+'
+            insertText: '+'
         },
         {
             label: 'Not ¬',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'not',
-            insertText : '¬'
+            insertText: '¬'
         },
         {
             label: 'Such that ∣',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'such that',
-            insertText : '∣'
+            insertText: '∣'
         },
         {
             label: 'Becomes such that :∣',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'becomes such that',
-            insertText : ':∣'
+            insertText: ':∣'
         },
         {
             label: 'And ∧',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'and',
-            insertText : '∧'
+            insertText: '∧'
         },
         {
             label: 'Or ∨',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'or',
-            insertText : '∨'
+            insertText: '∨'
         },
         {
             label: 'Not equal ≠',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'not equal',
-            insertText : '≠'
+            insertText: '≠'
         },
         {
             label: 'Less or equal ≤',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'less or equal',
-            insertText : '≤'
+            insertText: '≤'
         },
         {
             label: 'Greater or equal ≥',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'greater or equal',
-            insertText : '≥'
+            insertText: '≥'
         },
         // set related operators
         {
             label: 'Element of ∈',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'in',
-            insertText : '∈'
+            insertText: '∈'
         },
         {
             label: 'Becomes element of :∈',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'becomes in',
-            insertText : ':∈'
+            insertText: ':∈'
         },
         {
             label: 'Not element of ∉',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'not in',
-            insertText : '∉'
+            insertText: '∉'
         },
         {
             label: 'Strict subset ⊂',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'strict subset',
-            insertText : '⊂'
+            insertText: '⊂'
         },
         {
             label: 'Subset ⊆',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'subset',
-            insertText : '⊆'
+            insertText: '⊆'
         },
         {
             label: 'Not strict subset ⊄',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'not strict subset',
-            insertText : '⊄'
+            insertText: '⊄'
         },
         {
             label: 'Not subset ⊈',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'not subset',
-            insertText : '⊈'
+            insertText: '⊈'
         },
         {
             label: 'Union ∪',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'union',
-            insertText : '∪'
+            insertText: '∪'
         },
         {
             label: 'Intersection ∩',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'intersection',
-            insertText : '∩'
+            insertText: '∩'
         },
         {
             label: 'General union ⋃',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'general union',
-            insertText : '⋃'
+            insertText: '⋃'
         },
         {
             label: 'General intersection ⋂',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'general intersection',
-            insertText : '⋂'
+            insertText: '⋂'
         },
         {
             label: 'There exists ∃',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'there exists',
-            insertText : '∃'
+            insertText: '∃'
         },
         {
             label: 'For all ∀',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'for all',
-            insertText : '∀'
+            insertText: '∀'
         },
         {
             label: 'Set minus ∖',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'set minus',
-            insertText : '∖'
+            insertText: '∖'
         },
         {
             label: 'Cartesian product ×',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'cartesian product',
-            insertText : '×'
+            insertText: '×'
         },
         // Sets
         {
             label: 'Natural numbers ℕ',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
             filterText: 'naturals',
-            insertText : 'ℕ'
+            insertText: 'ℕ'
         },
         {
             label: 'Positive numbers ℕ1',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
             filterText: 'positive numbers',
-            insertText : 'ℕ1'
+            insertText: 'ℕ1'
         },
         {
             label: 'Powerset ℙ',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
             filterText: 'powerset',
-            insertText : 'ℙ'
+            insertText: 'ℙ'
         },
         {
             label: 'Non-empty powerset ℙ1',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
             filterText: 'non empty powerset',
-            insertText : 'ℙ1'
+            insertText: 'ℙ1'
         },
         {
             label: 'Integers ℤ',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
             filterText: 'integers',
-            insertText : 'ℤ'
+            insertText: 'ℤ'
         },
         {
             label: 'Empty set ∅',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
             filterText: 'empty set',
-            insertText : '∅'
+            insertText: '∅'
         },
         // Arrows
         {
             label: 'Implication ⇒',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             insertText: '⇒',
             filterText: 'implies'
         },
         {
             label: 'Equivalence ⇔',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'equiv',
-            insertText : '⇔'
+            insertText: '⇔'
         },
         {
             label: 'Relation ↔',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'relation',
-            insertText : '↔'
+            insertText: '↔'
         },
         {
             label: 'Total relation ',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'total relation',
-            insertText : ''
+            insertText: ''
         },
         {
             label: 'Surjective relation ',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'surjective relation',
-            insertText : ''
+            insertText: ''
         },
         {
             label: 'Total surjective relation ',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'total surjective relation',
-            insertText : ''
+            insertText: ''
         },
         {
             label: 'Partial function ⇸',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'partial function',
-            insertText : '⇸'
+            insertText: '⇸'
         },
         {
             label: 'Total function →',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'total function',
-            insertText : '→'
+            insertText: '→'
         },
         {
             label: 'Partial injection ⤔',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'partial injection',
-            insertText : '⤔'
+            insertText: '⤔'
         },
         {
             label: 'Total injection ↣',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'total injection',
-            insertText : '↣'
+            insertText: '↣'
         },
         {
             label: 'Partial surjection ⤀',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'partial surjection',
-            insertText : '⤀'
+            insertText: '⤀'
         },
         {
             label: 'Total surjection ↠',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'total surjection',
-            insertText : '↠'
+            insertText: '↠'
         },
         {
             label: 'Bijection ⤖',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'bijection',
-            insertText : '⤖'
+            insertText: '⤖'
         },
         {
             label: 'Maplet ↦',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'maplet',
-            insertText : '↦'
+            insertText: '↦'
         },
         // weird stuff
         {
             label: 'Relation overriding ',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'relation overriding',
-            insertText : ''
+            insertText: ''
         },
         {
             label: 'Backward composition ∘',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'backward composition',
-            insertText : '∘'
+            insertText: '∘'
         },
         {
             label: 'Direct product ⊗',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'direct product',
-            insertText : '⊗'
+            insertText: '⊗'
         },
         {
             label: 'Parallel product ∥',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'parallel product',
-            insertText : '∥'
+            insertText: '∥'
         },
         {
             label: 'Tilde operator ∼',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'tilde',
-            insertText : '∼'
+            insertText: '∼'
         },
         {
             label: 'Domain restriction ◁',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'domain restriction',
-            insertText : '◁'
+            insertText: '◁'
         },
         {
             label: 'Domain subtraction ⩤',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'domain subtraction',
-            insertText : '⩤'
+            insertText: '⩤'
         },
         {
             label: 'Range restriction ▷',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'range restriction',
-            insertText : '▷'
+            insertText: '▷'
         },
         {
             label: 'Range subtraction ⩥',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'range subtraction',
-            insertText : '⩥'
+            insertText: '⩥'
         },
         {
             label: 'Lambda λ',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'lambda',
-            insertText : 'λ'
+            insertText: 'λ'
         },
         {
             label: 'Up to ‥',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'up to',
-            insertText : '‥'
+            insertText: '‥'
         },
         {
             label: 'Middle dot ·',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'middle dot',
-            insertText : '·'
+            insertText: '·'
         },
         {
             label: 'True predicate ⊤',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'true predicate',
-            insertText : '⊤'
+            insertText: '⊤'
         },
         {
             label: 'False predicate ⊥',
-            kind: vscode_languageserver.CompletionItemKind.Operator,
+            kind: vsls.CompletionItemKind.Operator,
             filterText: 'false predicate',
-            insertText : '⊥'
+            insertText: '⊥'
         },
 
         // == Event-B constants ==
         {
             label: 'FALSE',
-            kind: vscode_languageserver.CompletionItemKind.Constant
+            kind: vsls.CompletionItemKind.Constant
         },
         {
             label: 'TRUE',
-            kind: vscode_languageserver.CompletionItemKind.Constant
+            kind: vsls.CompletionItemKind.Constant
         },
 
         // == Event-B keywords ==
         {
             label: 'extends',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'theorem',
-            kind: vscode_languageserver.CompletionItemKind.Keyword,
+            kind: vsls.CompletionItemKind.Keyword,
             insertText: 'theorem '
         },
         {
             label: 'refines',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'sees',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'with',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'where',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'any',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'then',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'end',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'variables',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'events',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'convergent',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
         {
             label: 'anticipated',
-            kind: vscode_languageserver.CompletionItemKind.Keyword
+            kind: vsls.CompletionItemKind.Keyword
         },
 
         // == misc ==
         {
             label: 'BOOL',
-            kind: vscode_languageserver.CompletionItemKind.Class,
+            kind: vsls.CompletionItemKind.Class,
         },
 
-        ];
+    ];
 });
 
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve(
-	(item) => {
+    (item) => {
         // TODO
-		// if (item.data === 1) {
-		// 	item.detail = 'Machine';
-		// 	item.documentation = 'TypeScript documentation';
-		// } else if (item.data === 2) {
-		// 	item.detail = 'Invariants';
-		// 	item.documentation = 'JavaScript documentation';
-		// }
-		return item;
-	}
+        // if (item.data === 1) {
+        // 	item.detail = 'Machine';
+        // 	item.documentation = 'TypeScript documentation';
+        // } else if (item.data === 2) {
+        // 	item.detail = 'Invariants';
+        // 	item.documentation = 'JavaScript documentation';
+        // }
+        return item;
+    }
 );
 
 // Make the text document manager listen on the connection
