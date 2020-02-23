@@ -27,6 +27,5 @@ The keyword of a symbol is often its English name (ex: *for all*), its most comm
 
 ## Upcoming features
 
-- More accurate autocompletion.
 - Commands to create files.
 - Compiler for context files.
