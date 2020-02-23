@@ -91,6 +91,7 @@ async function validateTextDocument(textDocument) {
 
     let diagnostics = [];
 
+    // Syntax analysis
     try {
         parser.parse(text);
     }
@@ -120,9 +121,6 @@ async function validateTextDocument(textDocument) {
             else if (err.message.includes(`Expected predicate but`) && word == "then") {
                 message = "Provide predicates in the \"where\" section or remove the \"where\" keyword.";
             }
-            else if (err.message.includes(`Expected predicate but`) && word != "events" && word != "end" && word != "with") {
-                message = "Did you forget to put a @tag before your predicate ?";
-            }
             else if (err.message.includes("label") && word == "end") {
                 message = "You must provide at least one action.";
             }
@@ -146,6 +144,9 @@ async function validateTextDocument(textDocument) {
             }
             else if (err.message.includes("label") && word != "events" && word != "end" && word != "with") {
                 message = "Did you forget to put a @tag before your line ?";
+            }
+            else if (err.message.includes(`Expected predicate but`) && word != "events" && word != "end" && word != "with") {
+                message = "Did you forget to put a @tag before your predicate ?";
             }
 
             // save related information

@@ -11,6 +11,9 @@ async function initProject() {
         // ask the project name to the user
         let name = await vscode.window.showInputBox({ prompt: "Enter a name for your project", placeHolder: "hello_world", validateInput: validateProjectName });
 
+        if (!name)
+            return;
+
         const folders = await vscode.window.showOpenDialog({ canSelectFolders: true, openLabel: "Select a folder to create the project in" });
         if (!folders || folders.length !== 1)
             return;

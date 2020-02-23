@@ -13,10 +13,11 @@ If you enjoy this extension, please consider starring it on [GitHub](https://git
 
 ## Usage
 
-1. You can create and edit `.bc` (context) and `.bm` (machine) files in Visual Studio with this extension.
-2. Machine files will automatically compile to a Rodin-friendly XML. This XML is located in the ./bin folder.
-3. Open the ./bin folder in Rodin (you may have to test different things in order to get your workspace correctly setup)
-4. When ever you want to test your code, send `F5` to the Rodin Editor to reload the XML and refresh Pro-B.
+With the command palette (`CTRL+SHIFT+P` or `View > Command Palette`), execute the command : `[Event-B] New Project`. 
+
+The command will ask you a **project name** and the **path to a directory**. The specified directory doesn't need to be empty : the command will create a subdirectory for the project, in which the basic project files will be generated.
+
+The `getting_started.md` file will contain all the info you need to develop your incredibly useful Event-B project.
 
 ## Symbols
 
@@ -29,4 +30,3 @@ The keyword of a symbol is often its English name (ex: *for all*), its most comm
 - More accurate autocompletion.
 - Commands to create files.
 - Compiler for context files.
-- Syntax error preview in editor.

@@ -111,13 +111,15 @@ function setCommandVisibility() {
     let separator = '/'
     let directory = vscode.workspace.rootPath;
 
+    // is a workspace opened ?
+    const workspaceOpened = !!directory;
+
     // windows ?
-    if (directory.lastIndexOf('\\') >= 0) {
+    if (workspaceOpened && directory.lastIndexOf('\\') >= 0) {
         separator = '\\';
     }
 
-    // is a workspace opened ?
-    const workspaceOpened = !!directory;
+    console.log(workspaceOpened && fs.existsSync(directory + separator + ".metadata") && fs.existsSync(directory + separator + "rodin-project"));
 
     // only show commands in a rodin project (workspace opened, and there is a .metadata folder and a rodin-project folder)
     const shouldShowCommands = workspaceOpened && fs.existsSync(directory + separator + ".metadata") && fs.existsSync(directory + separator + "rodin-project");
