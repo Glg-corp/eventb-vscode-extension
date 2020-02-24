@@ -2,6 +2,10 @@
 
 All notable changes to the "eventb" extension will be documented in this file.
 
+## 4.0.0
+- Added compiler for context files
+- Auto replace classic "+-*/" symbols with their rodinic equivalent
+
 ## 3.1.0
 - The extension now displays syntax errors in editor.
 - Optimized project structure for simplicity and efficency.

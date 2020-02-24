@@ -28,29 +28,26 @@ function compile(file) {
 
             directory += separator;
 
+            // read file
+            data = fs.readFileSync(file, 'utf8');
+            console.log(`[Event-B] Compiling ${file}.`);
+
+            // Pre compile: replace annoying symbols
+            data = data.replace(/\+/g, '+')
+                       .replace(/-/g, '−')
+                       .replace(/\*/g, '∗')
+                       .replace(/(?<!\/)\/(?!\/)/g, '÷');
+
+
             // Machine file
             if (extension === 'bm') {
-
-                data = fs.readFileSync(file, 'utf8');
-
-                console.log(`[Event-B] Compiling ${file}.`);
-
                 result = machineParser.parse(data);
-
                 exportMachineToXML(result, directory);
-
             }
             // Context files
             else if (extension === 'bc') {
-
-                data = fs.readFileSync(file, 'utf8');
-
-                console.log(`[Event-B] Compiling ${file}.`);
-
                 result = contextParser.parse(data);
-
                 exportContextToXML(result, directory);
-
             }
         }
         catch (exception) {
@@ -71,8 +68,50 @@ function getExtension(path) {
     return basename.slice(pos + 1);            // extract extension ignoring `.`
 }
 
-function exportContextToXML(jsonData, directory){
-    console.log(jsonData);
+function exportContextToXML(jsonData, directory) {
+    let index = 1;
+
+    // get file name
+    let fileName = directory + jsonData.name + ".buc";
+
+    // build core file
+    xml = builder.create("org.eventb.core.contextFile");
+    xml.att({ version: "3", "org.eventb.core.configuration": "org.eventb.core.fwd;de.prob.symbolic.ctxBase" });
+
+    // extends ?
+    if (jsonData.content.extends) {
+        xml.ele("org.eventb.core.extendsContext", { name: index.toString(), "org.eventb.core.target": jsonData.content.extends.target });
+        index++;
+    }
+
+    // sets ?
+    if (jsonData.content.sets) {
+        jsonData.content.sets.forEach((value) => {
+            xml.ele("org.eventb.core.carrierSet", { name: index.toString(), "org.eventb.core.identifier": value });
+            index++;
+        });
+    }
+
+    // constants ?
+    if (jsonData.content.constants) {
+        jsonData.content.constants.forEach((value) => {
+            xml.ele("org.eventb.core.constant", { name: index.toString(), "org.eventb.core.identifier": value, "de.prob.symbolic.symbolicAttribute": "false" });
+            index++;
+        });
+    }
+
+    // axioms ?
+    if (jsonData.content.axioms) {
+        jsonData.content.axioms.forEach((element) => {
+            xml.ele("org.eventb.core.axiom", { name: index.toString(), "org.eventb.core.label": element.label, "org.eventb.core.predicate": element.predicate, "org.eventb.core.theorem": element.theorem.toString() });
+            index++;
+        });
+    }
+
+    let output = xml.end({ pretty: true });
+
+    fs.writeFileSync(fileName, output, 'utf8');
+
 }
 
 function exportMachineToXML(jsonData, directory) {

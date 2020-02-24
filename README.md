@@ -8,8 +8,7 @@ If you enjoy this extension, please consider starring it on [GitHub](https://git
 
 ## Installation
 
-1. In Rodin, install the "Camille text editor" plug-in. You'll only need it for context files.
-2. Install this extension.
+1. Install this extension. That's all.
 
 ## Usage
 
@@ -24,8 +23,3 @@ The `getting_started.md` file will contain all the info you need to develop your
 As you know, Event-B uses a lot of unicode symbols. You can create them in VSCode with IntelliSense, using the corresponding keyword of the symbol you want.
 
 The keyword of a symbol is often its English name (ex: *for all*), its most common associated keyword (ex: *in*) or its name in Rodin (ex: *Partial injection*?!).
-
-## Upcoming features
-
-- Commands to create files.
-- Compiler for context files.

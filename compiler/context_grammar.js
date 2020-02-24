@@ -148,17 +148,17 @@ function peg$parse(input, options) {
       peg$c4 = function(name, content) {
           	return {name:name, content: content};
           },
-      peg$c5 = function(refines, s) {return s},
-      peg$c6 = function(refines, sets, constants, axioms) {
-          	return {refines: refines, sets: sets, constants:constants, axioms: axioms};
+      peg$c5 = function(ext, s) {return s},
+      peg$c6 = function(ext, sets, constants, axioms) {
+          	return {extends: ext, sets: sets, constants:constants, axioms: axioms};
           },
       peg$c7 = "sets",
       peg$c8 = peg$literalExpectation("sets", false),
       peg$c9 = function(name) {
           	return name.map(elem => elem[1]);
           },
-      peg$c10 = "refines",
-      peg$c11 = peg$literalExpectation("refines", false),
+      peg$c10 = "extends",
+      peg$c11 = peg$literalExpectation("extends", false),
       peg$c12 = function(target) {
           	return {target: target}
           },
@@ -435,7 +435,7 @@ function peg$parse(input, options) {
     var s0, s1, s2, s3, s4, s5, s6, s7;
 
     s0 = peg$currPos;
-    s1 = peg$parseRefines();
+    s1 = peg$parseExtends();
     if (s1 === peg$FAILED) {
       s1 = null;
     }
@@ -573,7 +573,7 @@ function peg$parse(input, options) {
     return s0;
   }
 
-  function peg$parseRefines() {
+  function peg$parseExtends() {
     var s0, s1, s2, s3;
 
     s0 = peg$currPos;

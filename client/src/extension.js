@@ -29,7 +29,7 @@ function activate(context) {
     vscode.workspace.onDidChangeWorkspaceFolders((event) => { setCommandVisibility(); });
 
     // register watcher
-    const watcher = vscode.workspace.createFileSystemWatcher("**/*.bm");
+    const watcher = vscode.workspace.createFileSystemWatcher("**/*.b[cm]");
     watcher.onDidChange(handleFileSystemChange, this);
 }
 

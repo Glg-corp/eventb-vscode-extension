@@ -1,4 +1,4 @@
-// Event-B Machine file grammar
+// Event-B Context file grammar
 // ==========================
 
 Context 
@@ -7,11 +7,11 @@ Context
     }
     
 ContextContent
-	= refines:Refines? _ 
+	= ext:Extends? _ 
 	sets:(s:Sets _LB {return s})? _
 	constants:Constants? _ axioms:Axioms?
     {
-    	return {refines: refines, sets: sets, constants:constants, axioms: axioms};
+    	return {extends: ext, sets: sets, constants:constants, axioms: axioms};
     }
 
 Sets
@@ -19,8 +19,8 @@ Sets
     	return name.map(elem => elem[1]);
     }
     
-Refines
-	= "refines" _ target:Name {
+Extends
+	= "extends" _ target:Name {
     	return {target: target}
     }
     
