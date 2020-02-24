@@ -87,7 +87,7 @@ async function validateTextDocument(textDocument) {
 
     let text = textDocument.getText();
 
-    console.log(textDocument);
+    console.log(textDocument.uri);
 
     let diagnostics = [];
 

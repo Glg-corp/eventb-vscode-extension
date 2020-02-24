@@ -1,22 +1,20 @@
-parser = require('./machine_grammar');
+machineParser = require('./machine_grammar');
+contextParser = require('./context_grammar');
 fs = require('fs');
 builder = require("xmlbuilder");
 process = require("process");
 vscode = require("vscode");
 
 function compile(file) {
-    if (getExtension(file) === 'bm') {
+
+    const extension = getExtension(file);
+
+    if (extension === 'bm' || extension === 'bc') {
+
+        let separator = '/'
+        let directory = vscode.workspace.rootPath;
+
         try {
-            data = fs.readFileSync(file, 'utf8');
-
-            console.log(`[Event-B] Compiling ${file}.`);
-
-            result = parser.parse(data);
-
-
-            let separator = '/'
-            let directory = vscode.workspace.rootPath;
-
             // windows ?
             if (directory.lastIndexOf('\\') >= 0) {
                 separator = '\\';
@@ -30,16 +28,35 @@ function compile(file) {
 
             directory += separator;
 
-            exportToXML(result, directory);
+            // Machine file
+            if (extension === 'bm') {
 
+                data = fs.readFileSync(file, 'utf8');
 
+                console.log(`[Event-B] Compiling ${file}.`);
+
+                result = machineParser.parse(data);
+
+                exportMachineToXML(result, directory);
+
+            }
+            // Context files
+            else if (extension === 'bc') {
+
+                data = fs.readFileSync(file, 'utf8');
+
+                console.log(`[Event-B] Compiling ${file}.`);
+
+                result = contextParser.parse(data);
+
+                exportContextToXML(result, directory);
+
+            }
         }
         catch (exception) {
             console.log(`[Event-B] Exception during compilation :\n${exception}`);
-
         }
     }
-
 }
 
 // from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
@@ -54,7 +71,11 @@ function getExtension(path) {
     return basename.slice(pos + 1);            // extract extension ignoring `.`
 }
 
-function exportToXML(jsonData, directory) {
+function exportContextToXML(jsonData, directory){
+    console.log(jsonData);
+}
+
+function exportMachineToXML(jsonData, directory) {
 
     let index = 1;
 
