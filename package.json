@@ -86,7 +86,7 @@
 		"keybindings": [
 			{
 				"command": "eventb.compileCurrentFile",
-				"when": "editorLangId == eventb-machine",
+				"when": "editorLangId == eventb-machine || editorLangId == eventb-context",
 				"key": "f5"
 			}
 		],
@@ -94,7 +94,7 @@
 			"commandPalette": [
 				{
 					"command": "eventb.compileCurrentFile",
-					"when": "editorLangId == eventb-machine"
+					"when": "editorLangId == eventb-machine || editorLangId == eventb-context"
 				},
 				{
 					"command": "eventb.openInRodin",

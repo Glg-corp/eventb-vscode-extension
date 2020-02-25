@@ -1,22 +1,20 @@
-parser = require('./machine_grammar');
+machineParser = require('./machine_grammar');
+contextParser = require('./context_grammar');
 fs = require('fs');
 builder = require("xmlbuilder");
 process = require("process");
 vscode = require("vscode");
 
 function compile(file) {
-    if (getExtension(file) === 'bm') {
+
+    const extension = getExtension(file);
+
+    if (extension === 'bm' || extension === 'bc') {
+
+        let separator = '/'
+        let directory = vscode.workspace.rootPath;
+
         try {
-            data = fs.readFileSync(file, 'utf8');
-
-            console.log(`[Event-B] Compiling ${file}.`);
-
-            result = parser.parse(data);
-
-
-            let separator = '/'
-            let directory = vscode.workspace.rootPath;
-
             // windows ?
             if (directory.lastIndexOf('\\') >= 0) {
                 separator = '\\';
@@ -30,16 +28,32 @@ function compile(file) {
 
             directory += separator;
 
-            exportToXML(result, directory);
+            // read file
+            data = fs.readFileSync(file, 'utf8');
+            console.log(`[Event-B] Compiling ${file}.`);
+
+            // Pre compile: replace annoying symbols
+            data = data.replace(/\+/g, '+')
+                       .replace(/-/g, '−')
+                       .replace(/\*/g, '∗')
+                       .replace(/(?<!\/)\/(?!\/)/g, '÷');
 
 
+            // Machine file
+            if (extension === 'bm') {
+                result = machineParser.parse(data);
+                exportMachineToXML(result, directory);
+            }
+            // Context files
+            else if (extension === 'bc') {
+                result = contextParser.parse(data);
+                exportContextToXML(result, directory);
+            }
         }
         catch (exception) {
             console.log(`[Event-B] Exception during compilation :\n${exception}`);
-
         }
     }
-
 }
 
 // from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
@@ -54,7 +68,53 @@ function getExtension(path) {
     return basename.slice(pos + 1);            // extract extension ignoring `.`
 }
 
-function exportToXML(jsonData, directory) {
+function exportContextToXML(jsonData, directory) {
+    let index = 1;
+
+    // get file name
+    let fileName = directory + jsonData.name + ".buc";
+
+    // build core file
+    xml = builder.create("org.eventb.core.contextFile");
+    xml.att({ version: "3", "org.eventb.core.configuration": "org.eventb.core.fwd;de.prob.symbolic.ctxBase" });
+
+    // extends ?
+    if (jsonData.content.extends) {
+        xml.ele("org.eventb.core.extendsContext", { name: index.toString(), "org.eventb.core.target": jsonData.content.extends.target });
+        index++;
+    }
+
+    // sets ?
+    if (jsonData.content.sets) {
+        jsonData.content.sets.forEach((value) => {
+            xml.ele("org.eventb.core.carrierSet", { name: index.toString(), "org.eventb.core.identifier": value });
+            index++;
+        });
+    }
+
+    // constants ?
+    if (jsonData.content.constants) {
+        jsonData.content.constants.forEach((value) => {
+            xml.ele("org.eventb.core.constant", { name: index.toString(), "org.eventb.core.identifier": value, "de.prob.symbolic.symbolicAttribute": "false" });
+            index++;
+        });
+    }
+
+    // axioms ?
+    if (jsonData.content.axioms) {
+        jsonData.content.axioms.forEach((element) => {
+            xml.ele("org.eventb.core.axiom", { name: index.toString(), "org.eventb.core.label": element.label, "org.eventb.core.predicate": element.predicate, "org.eventb.core.theorem": element.theorem.toString() });
+            index++;
+        });
+    }
+
+    let output = xml.end({ pretty: true });
+
+    fs.writeFileSync(fileName, output, 'utf8');
+
+}
+
+function exportMachineToXML(jsonData, directory) {
 
     let index = 1;
 

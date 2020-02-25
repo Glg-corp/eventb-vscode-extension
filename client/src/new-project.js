@@ -64,7 +64,9 @@ async function initProject() {
 *.bpo
 *.bpr
 *.bps
-*.bum`;
+*.bum
+*.bcc
+*.buc`;
         fs.writeFileSync(path.join(fsPath(projectFolderUri), ".gitignore"), content);
 
 
@@ -90,7 +92,7 @@ exports.initProject = initProject;
 
 function validateProjectName(input) {
     if (input.match(/^\w+$/) == null) {
-        return "A project name must contain letters, digits or underscores."
+        return "A project name must contain letters, digits or underscores.";
     }
 }
 

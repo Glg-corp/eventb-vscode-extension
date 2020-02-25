@@ -1,7 +1,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const vsls = require('vscode-languageserver');
-const parser = require("../../compiler/machine_grammar");
+const machineParser = require("../../compiler/machine_grammar");
+const contextParser = require("../../compiler/context_grammar");
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -80,20 +81,53 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
-    validateTextDocument(change.document);
+    const extension = getExtension(change.document.uri);
+    if (extension === 'bm') {
+        validateMachineTextDocument(change.document);
+    }
+    else if (extension === 'bc') {
+        validateContextTextDocument(change.document);
+    }
 });
 
-async function validateTextDocument(textDocument) {
-
+async function validateContextTextDocument(textDocument) {
     let text = textDocument.getText();
-
-    console.log(textDocument);
 
     let diagnostics = [];
 
     // Syntax analysis
     try {
-        parser.parse(text);
+        contextParser.parse(text);
+    }
+    catch (err) {
+        const wordStart = err.location.start.offset;
+        const wordEnd = getLastCharIndexOfWordAt(text, wordStart);
+        const word = text.slice(wordStart, wordEnd);
+
+        let diagnostic = {
+            severity: vsls.DiagnosticSeverity.Error,
+            range: {
+                start: textDocument.positionAt(wordStart),
+                end: textDocument.positionAt(wordEnd)
+            },
+            message: err.name + ": " + err.message.replace(/(?<=but ").(?=" found.)/, word)
+        };
+        diagnostics.push(diagnostic);
+    }
+
+    // Send the computed diagnostics to VS Code.
+    connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+}
+
+async function validateMachineTextDocument(textDocument) {
+
+    let text = textDocument.getText();
+
+    let diagnostics = [];
+
+    // Syntax analysis
+    try {
+        machineParser.parse(text);
     }
     catch (err) {
 
@@ -696,3 +730,15 @@ documents.listen(connection);
 
 // Listen on the connection
 connection.listen();
+
+// from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
+function getExtension(path) {
+    var basename = path.split(/[\\/]/).pop(),  // extract file name from full path ...
+        // (supports `\\` and `/` separators)
+        pos = basename.lastIndexOf(".");       // get last position of `.`
+
+    if (basename === "" || pos < 1)            // if file name is empty or ...
+        return "";                             //  `.` not found (-1) or comes first (0)
+
+    return basename.slice(pos + 1);            // extract extension ignoring `.`
+}
