@@ -4,7 +4,7 @@
 	"icon": "icon.jpg",
 	"publisher": "GlgCorp",
 	"description": "Event-B compiler, autocompletion, syntax highlighting, and snippets",
-	"version": "3.0.1",
+	"version": "3.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/glg-corp/eventb-vscode-extension"
