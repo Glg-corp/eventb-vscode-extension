@@ -34,12 +34,12 @@ function compile(file) {
 
             // Pre compile: replace annoying symbols
             data = data.replace(/\+/g, '+')
-                       .replace(/-/g, '−')
-                       .replace(/\*/g, '∗')
-                    //    .replace(/|/g, '∣')
-                    //    .replace(/:=/g, '≔')
-                    //    .replace(/(?<!\.)\.\.(?!\.)/g, '‥')
-                       .replace(/(?<!\/)\/(?!\/)/g, '÷');
+                .replace(/-/g, '−')
+                .replace(/\*/g, '∗')
+                //    .replace(/|/g, '∣')
+                //    .replace(/:=/g, '≔')
+                //    .replace(/(?<!\.)\.\.(?!\.)/g, '‥')
+                .replace(/(?<!\/)\/(?!\/)/g, '÷');
 
 
             // Machine file
@@ -174,8 +174,10 @@ function exportMachineToXML(jsonData, directory) {
 
             // refine/Extend
             if (element.target && element.name !== "INITIALISATION" && element.name !== "_") {
-                elem.ele("org.eventb.core.refinesEvent", { name: index.toString(), "org.eventb.core.target": element.target });
-                index++;
+                element.target.forEach((target) => {
+                    elem.ele("org.eventb.core.refinesEvent", { name: index.toString(), "org.eventb.core.target": target });
+                    index++;
+                })
             }
 
             // param ?

@@ -39,7 +39,8 @@ Events
 	= "events" _LB _ events:(Event*) { return events; }
     
 Event
-	= convergence:("anticipated" / "convergent")? __ "event" __ name:Name __ refine:(("extends" / "refines") __ Name)? _LB _ 
+	= convergence:("anticipated" / "convergent")? __ "event" __ name:Name __
+      refine:(("extends" / "refines") __ (n1:Name n2:(__ "," __ n:Name {return n})* {return [n1].concat(n2); }))? _LB _ 
     	any:Any? _
         where:Where? _ 
 		withValue:With? _
