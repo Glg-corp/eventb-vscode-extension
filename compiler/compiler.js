@@ -36,9 +36,9 @@ function compile(file) {
             data = data.replace(/\+/g, '+')
                        .replace(/-/g, '−')
                        .replace(/\*/g, '∗')
-                       .replace(/|/g, '∣')
-                       .replace(/:=/g, '≔')
-                       .replace(/(?<!\.)\.\.(?!\.)/g, '‥')
+                    //    .replace(/|/g, '∣')
+                    //    .replace(/:=/g, '≔')
+                    //    .replace(/(?<!\.)\.\.(?!\.)/g, '‥')
                        .replace(/(?<!\/)\/(?!\/)/g, '÷');
 
 
