@@ -173,7 +173,7 @@ function exportMachineToXML(jsonData, directory) {
             index++;
 
             // refine/Extend
-            if (element.target) {
+            if (element.target && element.name !== "INITIALISATION" && element.name !== "_") {
                 elem.ele("org.eventb.core.refinesEvent", { name: index.toString(), "org.eventb.core.target": element.target });
                 index++;
             }

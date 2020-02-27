@@ -200,7 +200,7 @@ async function validateMachineTextDocument(textDocument) {
     }
 
     // check if there is a INITIALISATION event
-    if (/\bevent\b +\bINITIALISATION\b[ \t\r\n]*\bthen\b(?:[ \t\r\n]*.*(?=end))*\bend\b/s.exec(text) == null) {
+    if (/\bevent\b +\bINITIALISATION\b[ \t\r\n]*(?:\b(?:extends|refines)\b +\w+[ \t\r\n]*)?\bthen\b.+?\bend\b/s.exec(text) == null) {
         let diagnostic = {
             severity: vsls.DiagnosticSeverity.Warning,
             range: {
