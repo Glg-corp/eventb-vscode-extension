@@ -43,7 +43,7 @@ Event
     	any:Any? _
         where:Where? _ 
 		withValue:With? _
-        then:Then _
+        then:Then? _
       "end"  _ {
       	let target, extended;
         if (refine) {

@@ -890,6 +890,9 @@ function peg$parse(input, options) {
                                 s15 = peg$parse_();
                                 if (s15 !== peg$FAILED) {
                                   s16 = peg$parseThen();
+                                  if (s16 === peg$FAILED) {
+                                    s16 = null;
+                                  }
                                   if (s16 !== peg$FAILED) {
                                     s17 = peg$parse_();
                                     if (s17 !== peg$FAILED) {
