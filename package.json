@@ -10,7 +10,7 @@
 		"url": "https://github.com/glg-corp/eventb-vscode-extension"
 	},
 	"engines": {
-		"vscode": "^1.42.0"
+		"vscode": "^1.33.0"
 	},
 	"categories": [
 		"Programming Languages"
